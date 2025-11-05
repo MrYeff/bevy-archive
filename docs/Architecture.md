@@ -9,7 +9,9 @@ This is the draft for the first stage of development. This only includes registe
 
 Js should be minimized. The frontend stack is:
 
-Htmx > axum_template > terra
+Alpine.js + Htmx > axum_template > tera
+
+Alpine.js must be used with only frontend data (no server calls).
 
 ### Core
 
