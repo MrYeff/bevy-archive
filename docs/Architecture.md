@@ -57,7 +57,7 @@ Intent: Load the post content
 
 return register page (1 box for the github url)
 
-#### fetch:/articles/new/load(url) -> htmx::Page
+#### fetch:/articles/new/load_meta(url) -> htmx::Page
 
 - if in chache:
   - get meta from chache
@@ -67,7 +67,7 @@ return register page (1 box for the github url)
   - request load
   - return "retry later"
 
-#### post:/articles/new/register(url) -> htmx::Page
+#### post:/articles/new/register(url) -> ()
 
 expects: meta load to chache
 

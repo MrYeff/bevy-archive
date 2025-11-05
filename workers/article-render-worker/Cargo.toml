@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tokio = { workspace = true }
+tokio.workspace = true
 
-redis = { workspace = true }
-sqlx = { workspace = true }
+redis.workspace = true
+sqlx.workspace = true
 
-reqwest = { workspace = true }
-comrak = { workspace = true }
+reqwest.workspace = true
+comrak.workspace = true

@@ -1,0 +1,16 @@
+{% match state %} 
+    {% when PreviewLoadState::Loading %} 
+        {% include "article/new/load_preview.html"%} 
+    {% when PreviewLoadState::Loaded(Err(err)) %} 
+        <div class="error">Error loading metadata: {{err}}</div> 
+    {% when PreviewLoadState::Loaded(Ok(meta)) %} 
+        <div class="preview"> 
+            <h2>{{meta.name}}</h2> 
+            <p>Tags: 
+                {% for tag in meta.tags %}
+                    <span>{{ tag }} |</span>
+                {% endfor %}
+            </p> 
+            <button hx-post="/article/new/{{temp_id}}/register" hx-swap="outerHTML">register</button>
+        </div>
+{% endmatch %}
