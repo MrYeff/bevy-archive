@@ -6,9 +6,14 @@ edition = "2024"
 [dependencies]
 tokio.workspace = true
 
-redis.workspace = true
+fred.workspace = true
 
 serde.workspace = true
 serde_toml.workspace = true
 
 reqwest.workspace = true
+futures.workspace = true
+
+shared = { path = "../../shared" }
+redis = { path = "../../redis" }
+constants = { path = "../../constants" }

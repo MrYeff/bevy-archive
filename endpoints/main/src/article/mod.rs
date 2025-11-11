@@ -4,7 +4,9 @@ mod root;
 
 use axum::{Router, routing::*};
 
-pub(super) fn route() -> Router {
+use crate::Ctx;
+
+pub(super) fn route() -> Router<Ctx> {
     Router::new()
         .route("/{id}", get(root::handler))
         .route("/{id}/content", get(content::handler))

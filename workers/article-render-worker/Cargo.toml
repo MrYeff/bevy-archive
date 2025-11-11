@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 tokio.workspace = true
 
-redis.workspace = true
+fred.workspace = true
 sqlx.workspace = true
 
 reqwest.workspace = true

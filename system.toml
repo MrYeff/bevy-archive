@@ -1,0 +1,10 @@
+# 
+main_endpoint_url = "http://localhost:3000"
+
+# render worker
+render_worker_redis_url = "redis://localhost:5000/"
+render_worker_key = "render_article"
+
+# preload article worker worker
+preload_article_worker_redis_url = "redis://localhost:5000"
+preload_article_worker_key = "preload_article"

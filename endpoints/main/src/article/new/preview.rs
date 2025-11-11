@@ -1,46 +1,87 @@
-use std::{error::Error, time::Duration};
-
 use askama::Template;
 use axum::{
-    extract::Path,
+    extract::{Query, State},
+    http::StatusCode,
     response::{Html, IntoResponse},
 };
-use derive_more::Display;
+use serde::Deserialize;
+use shared::{Url, article_preloading::PreloadArticleResult};
+use std::time::Duration;
 
-pub(super) async fn handler(Path(temp_id): Path<u32>) -> impl IntoResponse {
-    // TODO load preview -> return preview after load is done
+use crate::Ctx;
+
+pub(super) async fn handler(
+    State(ctx): State<Ctx>,
+    params: Query<PreviewParams>,
+) -> impl IntoResponse {
+    let url = match Url::try_from(params.url.clone()) {
+        Ok(url) => url,
+        Err(_) => return (StatusCode::BAD_REQUEST, "Invalid URL").into_response(),
+    };
+    // TODO schedule load -> return temp id for loading preview
+    let rsp = match ctx
+        .preload_article_worker_tx
+        .try_fetch_result(url.clone().into())
+        .await
+    {
+        Ok(rsp) => rsp,
+        Err(_) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to preload article",
+            )
+                .into_response();
+        }
+    };
+
+    let Some(result) = rsp else {
+        if let Err(_) = ctx
+            .preload_article_worker_tx
+            .schedule_job(url.clone().into())
+            .await
+        {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to schedule article preload",
+            )
+                .into_response();
+        };
+
+        let template = LoadPreviewTemplate {
+            load_delay: Duration::from_millis(0),
+            url: url.into(),
+        };
+        return (
+            StatusCode::ACCEPTED,
+            Html(template.render().unwrap()).into_response(),
+        )
+            .into_response();
+    };
 
     let template = PreviewTemplate {
-        load_delay: Duration::from_millis(500),
-        temp_id,
-        state: PreviewLoadState::Loaded(Ok(ArticleMeta {
-            name: "Example Article".into(),
-            tags: vec!["tag1".into(), "tag2".into(), "tag3".into()].into_boxed_slice(),
-        })),
+        url: url.into(),
+        result,
     };
-    Html(template.render().unwrap())
+    Html(template.render().unwrap()).into_response()
 }
 
+/// Displayed after preview is loaded
 #[derive(Template)]
 #[template(path = "article/new/preview.html")]
 struct PreviewTemplate {
-    load_delay: std::time::Duration,
-    temp_id: u32,
-    state: PreviewLoadState,
+    url: Box<str>,
+    result: PreloadArticleResult,
 }
 
-#[derive(Display)]
-enum LoadingError {
-    MissingManifest,
-    AlreadyImported,
+/// Displayed while loading preview
+#[derive(Template)]
+#[template(path = "article/new/load_preview.html")]
+struct LoadPreviewTemplate {
+    load_delay: Duration,
+    url: Box<str>,
 }
 
-enum PreviewLoadState {
-    Loading,
-    Loaded(Result<ArticleMeta, LoadingError>),
-}
-
-struct ArticleMeta {
-    name: Box<str>,
-    tags: Box<[Box<str>]>,
+#[derive(Deserialize)]
+pub struct PreviewParams {
+    url: Box<str>,
 }

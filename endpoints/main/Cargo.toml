@@ -7,12 +7,15 @@ edition = "2024"
 tokio.workspace = true
 axum.workspace = true
 
-redis.workspace = true
+fred.workspace = true
 sqlx.workspace = true
 
 serde.workspace = true
 serde_json.workspace = true
 
 askama.workspace = true
-htmx.workspace = true
-derive_more = { version = "2.0.1", features = ["display"] }
+derive_more.workspace = true
+
+shared = { path = "../../shared" }
+redis = { path = "../../redis" }
+constants = { path = "../../constants" }
