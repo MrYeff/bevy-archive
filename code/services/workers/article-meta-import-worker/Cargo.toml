@@ -1,0 +1,23 @@
+[package]
+name = "article-meta-import-worker"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio.workspace = true
+
+fred.workspace = true
+
+serde.workspace = true
+serde_toml.workspace = true
+
+reqwest.workspace = true
+futures.workspace = true
+
+config.workspace = true
+core.workspace = true
+redis.workspace = true
+
+thiserror.workspace = true
+anyhow.workspace = true
+clap.workspace = true
