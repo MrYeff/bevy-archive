@@ -14,8 +14,7 @@ serde_toml.workspace = true
 reqwest.workspace = true
 futures.workspace = true
 
-config.workspace = true
-core.workspace = true
+shared.workspace = true
 redis.workspace = true
 
 thiserror.workspace = true

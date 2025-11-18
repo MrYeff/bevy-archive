@@ -91,14 +91,13 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "config",
- "core",
  "fred",
  "futures",
  "redis",
  "reqwest",
  "serde",
  "serde_toml",
+ "shared",
  "thiserror",
  "tokio",
 ]
@@ -472,15 +471,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "config"
-version = "0.1.0"
-dependencies = [
- "derive_more",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "const-oid"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -491,19 +481,6 @@ name = "cookie-factory"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "396de984970346b0d9e93d1415082923c679e5ae5c3ee3dcbd104f5610af126b"
-
-[[package]]
-name = "core"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "config",
- "derive_more",
- "serde",
- "serde_json",
- "thiserror",
-]
 
 [[package]]
 name = "core-foundation"
@@ -1482,13 +1459,12 @@ dependencies = [
  "askama",
  "axum",
  "clap",
- "config",
- "core",
  "derive_more",
  "fred",
  "redis",
  "serde",
  "serde_json",
+ "shared",
  "sqlx",
  "thiserror",
  "tokio",
@@ -1922,10 +1898,10 @@ name = "redis"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "config",
  "fred",
  "serde",
  "serde_json",
+ "shared",
  "thiserror",
 ]
 
@@ -2252,6 +2228,18 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest",
+]
+
+[[package]]
+name = "shared"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "derive_more",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]

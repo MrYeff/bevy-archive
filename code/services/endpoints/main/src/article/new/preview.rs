@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{Html, IntoResponse},
 };
-use core::prelude::*;
+use shared::prelude::*;
 use serde::Deserialize;
 use std::time::Duration;
 

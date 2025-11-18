@@ -1,10 +1,9 @@
 use std::{marker::PhantomData, sync::Arc};
 
-use config::RedisAccess;
+use crate::utils::init_redis_client;
 use fred::prelude::*;
 use serde::{Serialize, de::DeserializeOwned};
-
-use crate::utils::init_redis_client;
+use shared::prelude::RedisAccess;
 
 #[derive(Clone)]
 pub struct JobWorkerTx<JID, JResult> {
@@ -24,11 +23,12 @@ where
     JID: ToString + Serialize,
     JResult: DeserializeOwned,
 {
-    pub async fn new(redis_access: RedisAccess) -> Result<Self, Error> {
+    pub async fn new(redis_access: impl Into<RedisAccess>) -> Result<Self, Error> {
+        let cfg = redis_access.into();
         Ok(Self {
             _phantom: PhantomData,
-            redis: init_redis_client(&redis_access.url).await?,
-            base_key: redis_access.base_key.clone(),
+            redis: init_redis_client(&cfg).await?,
+            base_key: cfg.base_key.clone(),
         })
     }
 
@@ -75,11 +75,12 @@ where
     JID: ToString + DeserializeOwned,
     JResult: Serialize,
 {
-    pub async fn new(redis_access: RedisAccess) -> Result<Self, Error> {
+    pub async fn new(redis_access: impl Into<RedisAccess>) -> Result<Self, Error> {
+        let cfg = redis_access.into();
         Ok(Self {
             _phantom: PhantomData,
-            redis: init_redis_client(&redis_access.url).await?,
-            base_key: redis_access.base_key.clone(),
+            redis: init_redis_client(&cfg).await?,
+            base_key: cfg.base_key.clone(),
         })
     }
 

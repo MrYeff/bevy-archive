@@ -20,12 +20,11 @@ askama = "0.14.0"
 comrak = "0.47.0"
 
 derive_more = { version = "2.0.1", features = ["display"] }
-clap = { version = "4.5.51", features = ["derive"] }
+clap = { version = "4.5.51", features = ["derive", "env"] }
 thiserror = "2.0.17"
 anyhow = "1.0.100"
 
 # libs
 
-config = { path = "libs/config" }
-core = { path = "libs/core" }
+shared = { path = "libs/shared" }
 redis = { path = "libs/redis" }

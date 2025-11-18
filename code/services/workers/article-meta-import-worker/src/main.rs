@@ -1,28 +1,25 @@
 use clap::Parser;
-use config::RedisDesignation;
-use core::{
-    article_preloading::{ArticleMeta, PreloadArticleResult, TempArticleId},
-    common_args::WorkerArgs,
-    setup::load_config,
-};
 use futures::future;
 use redis::job_worker::JobWorkerRx;
+use shared::prelude::*;
+
+#[derive(Debug, Parser, Clone)]
+struct Args {
+    #[command(flatten)]
+    worker: WorkerArgs,
+    #[command(flatten)]
+    redis_preload_worker: RedisAccessArgs<{ RedisDesignation::PreloadArticleWorkerCache as u32 }>,
+}
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> anyhow::Result<()> {
-    let args = WorkerArgs::try_parse()?;
-    let config = load_config(args.common.cfg)?;
+    let args = Args::try_parse()?;
 
     // Start the worker
     let ctx = WorkerCtx {
-        redis: JobWorkerRx::new(
-            config
-                .redis
-                .get_access(&RedisDesignation::PreloadArticleWorkerChache)?,
-        )
-        .await?,
+        redis: JobWorkerRx::new(&args.redis_preload_worker).await?,
     };
-    let workers: Box<[_]> = (0..args.workers)
+    let workers: Box<[_]> = (0..args.worker.workers)
         .map(|_| {
             let ctx = ctx.clone();
             tokio::spawn(async move {

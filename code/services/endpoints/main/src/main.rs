@@ -3,43 +3,38 @@ mod root;
 
 use axum::{Router, routing::*};
 use clap::Parser;
-use config::RedisDesignation;
-use core::{
-    article::{ArticleId, rendering::RenderArticleResult},
-    article_preloading::{PreloadArticleResult, TempArticleId},
-    common_args::EndpointArgs,
-    setup::load_config,
-};
 use redis::job_worker::JobWorkerTx;
+use shared::prelude::{rendering::RenderArticleResult, *};
 use tokio::net::TcpListener;
+
+#[derive(Debug, Parser, Clone)]
+struct Args {
+    #[command(flatten)]
+    endpoint: EndpointArgs,
+    #[command(flatten)]
+    pg_access: PgAccesArgs,
+    #[command(flatten)]
+    redis_render_worker: RedisAccessArgs<{ RedisDesignation::RenderWorkerCache as u32 }>,
+    #[command(flatten)]
+    redis_preload_worker: RedisAccessArgs<{ RedisDesignation::PreloadArticleWorkerCache as u32 }>,
+}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let args = EndpointArgs::try_parse()?;
-    let config = load_config(args.common.cfg)?;
+    let args = Args::try_parse()?;
 
     let app = Router::new()
         .route("/", get(root::handler))
         .nest("/article", article::route())
         .with_state(Ctx {
-            render_worker_tx: JobWorkerTx::new(
-                config
-                    .redis
-                    .get_access(&RedisDesignation::RenderWorkerChache)?,
-            )
-            .await?,
-            preload_article_worker_tx: JobWorkerTx::new(
-                config
-                    .redis
-                    .get_access(&RedisDesignation::PreloadArticleWorkerChache)?,
-            )
-            .await?,
+            render_worker_tx: JobWorkerTx::new(&args.redis_render_worker).await?,
+            preload_article_worker_tx: JobWorkerTx::new(&args.redis_preload_worker).await?,
         });
 
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", args.port))
+    let listener = TcpListener::bind(format!("127.0.0.1:{}", args.endpoint.port))
         .await
         .unwrap();
-    println!("Listening on http://127.0.0.1:{}", args.port);
+    println!("Listening on http://127.0.0.1:{}", args.endpoint.port);
     axum::serve(listener, app).await.unwrap();
     Ok(())
 }
