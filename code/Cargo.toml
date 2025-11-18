@@ -20,7 +20,7 @@ askama = "0.14.0"
 comrak = "0.47.0"
 
 derive_more = { version = "2.0.1", features = ["display"] }
-clap = { version = "4.5.51", features = ["derive", "env"] }
+clap = { version = "4.5.51", features = ["derive", "env", "string"] }
 thiserror = "2.0.17"
 anyhow = "1.0.100"
 
