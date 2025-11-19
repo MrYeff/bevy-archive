@@ -1,7 +1,13 @@
+mod process;
 use clap::Parser;
 use futures::future;
 use redis::job_worker::JobWorkerRx;
-use shared::prelude::*;
+use shared::{
+    jobs::article_preloading::{ImportError, PreloadArticleResult, TempArticleId},
+    prelude::*,
+};
+
+use crate::process::process_job;
 
 #[derive(Debug, Parser, Clone)]
 struct Args {
@@ -38,15 +44,9 @@ async fn run_worker(ctx: WorkerCtx) {
             panic!("Failed to fetch job from Redis"); // TODO: handle errors properly
         };
 
-        // TODO download and parse the article at job.0
-
-        let result = PreloadArticleResult::Success(ArticleMeta {
-            title: "pretending to have a backend".into(),
-            tags: Box::new(["example".into(), "demo".into()]),
-        });
-
+        let result = process_job(&job).await;
         ctx.redis
-            .store_result(job, result)
+            .store_result(job, result.map_err(|e| ImportError(e.to_string().into())))
             .await
             .expect("Failed to store job result"); // TODO: handle errors properly
     }

@@ -96,10 +96,11 @@ dependencies = [
  "redis",
  "reqwest",
  "serde",
- "serde_toml",
  "shared",
  "thiserror",
  "tokio",
+ "toml",
+ "url",
 ]
 
 [[package]]
@@ -107,12 +108,16 @@ name = "article-render-worker"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "clap",
  "comrak",
  "fred",
+ "redis",
  "reqwest",
+ "shared",
  "sqlx",
  "thiserror",
  "tokio",
+ "url",
 ]
 
 [[package]]
@@ -1468,6 +1473,7 @@ dependencies = [
  "sqlx",
  "thiserror",
  "tokio",
+ "url",
 ]
 
 [[package]]
@@ -2191,10 +2197,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_toml"
-version = "0.0.1"
+name = "serde_spanned"
+version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e68184169792863bfb6d8b5de8e15456ebf4302f28236f0ff1136591eb66541"
+checksum = "e24345aa0fe688594e73770a5f6d1b216508b4f93484c0026d521acd30134392"
+dependencies = [
+ "serde_core",
+]
 
 [[package]]
 name = "serde_urlencoded"
@@ -2240,6 +2249,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+ "url",
 ]
 
 [[package]]
@@ -2797,6 +2807,45 @@ dependencies = [
  "pin-project-lite",
  "tokio",
 ]
+
+[[package]]
+name = "toml"
+version = "0.9.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f0dc8b1fb61449e27716ec0e1bdf0f6b8f3e8f6b05391e8497b8b6d7804ea6d8"
+dependencies = [
+ "indexmap",
+ "serde_core",
+ "serde_spanned",
+ "toml_datetime",
+ "toml_parser",
+ "toml_writer",
+ "winnow",
+]
+
+[[package]]
+name = "toml_datetime"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2cdb639ebbc97961c51720f858597f7f24c4fc295327923af55b74c3c724533"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
+name = "toml_parser"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0cbe268d35bdb4bb5a56a2de88d0ad0eb70af5384a99d648cd4b3d04039800e"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "toml_writer"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df8b2b54733674ad286d16267dcfc7a71ed5c776e4ac7aa3c3e2561f7c637bf2"
 
 [[package]]
 name = "tower"

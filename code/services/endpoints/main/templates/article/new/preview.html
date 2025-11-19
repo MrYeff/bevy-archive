@@ -1,8 +1,8 @@
 {% match result %}
 
-{% when PreloadArticleResult::Failure(err) %}
+{% when Result::Err(err) %}
 <div class="error">Error loading metadata: {{ err }}</div>
-{% when PreloadArticleResult::Success(meta) %}
+{% when Result::Ok(meta) %}
 <div class="preview">
     <h2>{{ meta.title }}</h2>
     <p>

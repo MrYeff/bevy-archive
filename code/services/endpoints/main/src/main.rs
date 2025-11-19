@@ -4,7 +4,13 @@ mod root;
 use axum::{Router, routing::*};
 use clap::Parser;
 use redis::job_worker::JobWorkerTx;
-use shared::prelude::{rendering::RenderArticleResult, *};
+use shared::{
+    jobs::{
+        article_preloading::{PreloadArticleResult, TempArticleId},
+        article_rendering::{ArticleId, RenderArticleResult},
+    },
+    prelude::*,
+};
 use tokio::net::TcpListener;
 
 #[derive(Debug, Parser, Clone)]

@@ -22,3 +22,5 @@ redis.workspace = true
 thiserror.workspace = true
 anyhow.workspace = true
 clap.workspace = true
+
+url.workspace = true
