@@ -1,0 +1,3 @@
+title = "My test article"
+tags = ["rust", "github"]
+path_in_repo = "articles/test.md"

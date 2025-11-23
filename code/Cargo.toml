@@ -29,3 +29,4 @@ url = { version = "2.5.7", features = ["serde"] }
 
 shared = { path = "libs/shared" }
 redis = { path = "libs/redis" }
+httpmock = "0.7"
