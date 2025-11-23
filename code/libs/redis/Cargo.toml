@@ -13,3 +13,7 @@ thiserror.workspace = true
 anyhow.workspace = true
 
 shared.workspace = true
+
+tokio.workspace = true
+tokio-scoped.workspace = true
+futures.workspace = true

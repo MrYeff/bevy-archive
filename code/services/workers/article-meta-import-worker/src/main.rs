@@ -1,9 +1,12 @@
 mod process;
+
+use std::sync::Arc;
+
 use clap::Parser;
-use futures::future;
-use redis::job_worker::JobWorkerRx;
+use futures::FutureExt;
+use redis::job_worker::JobWorker;
 use shared::{
-    jobs::article_preloading::{ImportError, PreloadArticleResult, TempArticleId},
+    jobs::article_preloading::{ImportError, TempArticleId},
     prelude::*,
 };
 
@@ -19,40 +22,17 @@ struct Args {
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> anyhow::Result<()> {
-    let args = Args::try_parse()?;
+    let args = Args::parse();
 
-    // Start the worker
-    let ctx = WorkerCtx {
-        redis: JobWorkerRx::new(&args.redis_preload_worker).await?,
-    };
-    let workers: Box<[_]> = (0..args.worker.workers)
-        .map(|_| {
-            let ctx = ctx.clone();
-            tokio::spawn(async move {
-                run_worker(ctx).await;
-            })
-        })
-        .collect();
+    let worker = JobWorker::new(
+        &args.redis_preload_worker,
+        args.worker,
+        |jid: TempArticleId, _| {
+            process_job(jid).map(|r| r.map_err(|e| ImportError(e.to_string().into())))
+        },
+    )
+    .await?;
 
-    future::join_all(workers).await;
+    worker.run(Arc::new(())).await?;
     Ok(())
-}
-
-async fn run_worker(ctx: WorkerCtx) {
-    loop {
-        let Ok(job) = ctx.redis.fetch_next_job().await else {
-            panic!("Failed to fetch job from Redis"); // TODO: handle errors properly
-        };
-
-        let result = process_job(&job).await;
-        ctx.redis
-            .store_result(job, result.map_err(|e| ImportError(e.to_string().into())))
-            .await
-            .expect("Failed to store job result"); // TODO: handle errors properly
-    }
-}
-
-#[derive(Clone)]
-struct WorkerCtx {
-    redis: JobWorkerRx<TempArticleId, PreloadArticleResult>,
 }

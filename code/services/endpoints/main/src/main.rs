@@ -27,7 +27,7 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let args = Args::try_parse()?;
+    let args = Args::parse();
 
     let app = Router::new()
         .route("/", get(root::handler))

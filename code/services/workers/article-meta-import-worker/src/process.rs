@@ -2,7 +2,7 @@ use serde::Deserialize;
 use shared::jobs::article_preloading::{ArticleMeta, ImportError, TempArticleId};
 use url::Host;
 
-pub(super) async fn process_job(job: &TempArticleId) -> anyhow::Result<ArticleMeta> {
+pub(super) async fn process_job(job: TempArticleId) -> anyhow::Result<ArticleMeta> {
     let url = &job.0;
 
     if url.host() != Some(Host::Domain("github.com")) {
