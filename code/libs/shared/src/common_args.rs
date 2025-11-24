@@ -4,13 +4,13 @@ use std::sync::Arc;
 
 #[derive(Debug, Parser, Clone)]
 pub struct EndpointArgs {
-    #[arg(long, short = 'p', default_value_t = 8080)]
+    #[arg(long, short = 'p', default_value_t = 8080, env = "ENDPOINT_PORT")]
     pub port: u16,
 }
 
 #[derive(Debug, Parser, Clone)]
 pub struct WorkerArgs {
-    #[arg(long, short = 'w', default_value_t = 4)]
+    #[arg(long, short = 'w', default_value_t = 4, env = "WORKER_COUNT")]
     pub workers: u16,
 }
 
