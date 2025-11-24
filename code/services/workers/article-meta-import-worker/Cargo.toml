@@ -14,11 +14,12 @@ toml.workspace = true
 reqwest.workspace = true
 futures.workspace = true
 
-shared.workspace = true
-redis.workspace = true
-
 thiserror.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 url.workspace = true
 httpmock.workspace = true
+
+shared.workspace = true
+redis.workspace = true
+helpers.workspace = true

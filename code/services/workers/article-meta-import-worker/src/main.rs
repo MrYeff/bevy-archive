@@ -1,11 +1,13 @@
+use std::convert::Infallible;
+
 use article_meta_import_worker::{GitHubClient, process_job};
 use clap::Parser;
-use redis::job_worker::JobWorker;
+use futures::{StreamExt, never::Never, stream::FuturesUnordered};
+use redis::job_worker::JobWorkerRx;
 use shared::{
-    jobs::article_preloading::{ImportError, TempArticleId},
+    jobs::article_preloading::{ImportError, PreloadArticleResult, TempArticleId},
     prelude::*,
 };
-use std::sync::Arc;
 #[derive(Debug, Parser, Clone)]
 struct Args {
     #[command(flatten)]
@@ -14,26 +16,32 @@ struct Args {
     redis_preload_worker: RedisAccessArgs<{ RedisDesignation::PreloadArticleWorkerCache as u32 }>,
 }
 
-#[tokio::main(flavor = "multi_thread")]
-async fn main() -> anyhow::Result<()> {
+#[tokio::main(flavor = "current_thread")]
+async fn main() -> anyhow::Result<Never> {
     let args = Args::parse();
 
-    let worker = JobWorker::new(
-        &args.redis_preload_worker,
-        args.worker,
-        async move |jid: TempArticleId, ctx: Arc<Ctx>| {
-            process_job(jid, &ctx.client)
-                .await
-                .map_err(|e| ImportError(e.to_string().into()))
-        },
-    )
-    .await?;
+    let rx = JobWorkerRx::new(args.redis_preload_worker).await?;
+    let client = GitHubClient::new();
 
-    worker.run(Arc::new(Ctx::default())).await?;
-    Ok(())
+    let mut tasks = FuturesUnordered::new();
+
+    for _ in 0..args.worker.workers {
+        tasks.push(worker_loop(&rx, &client));
+    }
+
+    tasks.next().await.unwrap()?;
+    unreachable!("tasks only terminate on error");
 }
 
-#[derive(Default)]
-struct Ctx {
-    client: GitHubClient,
+async fn worker_loop(
+    rx: &JobWorkerRx<TempArticleId, PreloadArticleResult>,
+    client: &GitHubClient,
+) -> anyhow::Result<()> {
+    loop {
+        let jid = rx.fetch_next_job().await?;
+        let result = process_job(&jid, &client)
+            .await
+            .map_err(|e| ImportError(e.to_string().into()));
+        rx.store_result(jid, result).await?;
+    }
 }

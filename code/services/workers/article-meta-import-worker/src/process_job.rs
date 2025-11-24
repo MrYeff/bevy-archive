@@ -4,7 +4,10 @@ use url::Host;
 
 use crate::GitHubClient;
 
-pub async fn process_job(job: TempArticleId, client: &GitHubClient) -> anyhow::Result<ArticleMeta> {
+pub async fn process_job(
+    job: &TempArticleId,
+    client: &GitHubClient,
+) -> anyhow::Result<ArticleMeta> {
     let url = &job.0;
 
     if url.host() != Some(Host::Domain("github.com")) {
@@ -104,7 +107,7 @@ mod tests {
         .unwrap();
         let job = TempArticleId(job_url);
 
-        let meta = process_job(job, &github_client).await.unwrap();
+        let meta = process_job(&job, &github_client).await.unwrap();
 
         assert_eq!(&*meta.title, "My test article");
         assert_eq!(meta.tags.as_ref(), &["rust".into(), "github".into()]);
@@ -147,7 +150,7 @@ mod tests {
         let job_url = Url::parse("https://github.com/some-user/some-repo").unwrap();
         let job = TempArticleId(job_url);
 
-        let meta = process_job(job, &github_client).await.unwrap();
+        let meta = process_job(&job, &github_client).await.unwrap();
 
         assert_eq!(&*meta.title, "Main branch article");
         assert_eq!(meta.tags.as_ref(), &["rust".into()]);

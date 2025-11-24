@@ -65,23 +65,23 @@ fn rd_as_env(value: u32, param: &str) -> String {
     )
 }
 
-impl<const DESIGNATION: u32> From<&RedisAccessArgs<DESIGNATION>> for RedisAccess {
-    fn from(args: &RedisAccessArgs<DESIGNATION>) -> Self {
+impl<const DESIGNATION: u32> From<RedisAccessArgs<DESIGNATION>> for RedisAccess {
+    fn from(args: RedisAccessArgs<DESIGNATION>) -> Self {
         let url = format!("redis://{}:{}", args.host, args.port);
 
         Self {
             url: Arc::from(url),
-            base_key: Arc::from(args.base_key.clone()),
-            auth: args.auth.as_ref().map(|a| a.into()),
+            base_key: Arc::from(args.base_key),
+            auth: args.auth.map(|a| a.into()),
         }
     }
 }
 
-impl<const DESIGNATION: u32> From<&RedisAuthArgs<DESIGNATION>> for RedisAuth {
-    fn from(args: &RedisAuthArgs<DESIGNATION>) -> Self {
+impl<const DESIGNATION: u32> From<RedisAuthArgs<DESIGNATION>> for RedisAuth {
+    fn from(args: RedisAuthArgs<DESIGNATION>) -> Self {
         Self {
-            user: Arc::from(args.user.clone()),
-            password: Arc::from(args.password.clone()),
+            user: Arc::from(args.user),
+            password: Arc::from(args.password),
         }
     }
 }
