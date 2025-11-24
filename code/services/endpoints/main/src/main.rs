@@ -33,8 +33,8 @@ async fn main() -> anyhow::Result<()> {
         .route("/", get(root::handler))
         .nest("/article", article::route())
         .with_state(Ctx {
-            render_worker_tx: JobWorkerTx::new(&args.redis_render_worker).await?,
-            preload_article_worker_tx: JobWorkerTx::new(&args.redis_preload_worker).await?,
+            render_worker_tx: JobWorkerTx::new(args.redis_render_worker).await?,
+            preload_article_worker_tx: JobWorkerTx::new(args.redis_preload_worker).await?,
         });
 
     let listener = TcpListener::bind(format!("127.0.0.1:{}", args.endpoint.port))

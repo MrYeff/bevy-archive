@@ -25,8 +25,9 @@ clap = { version = "4.5.53", features = ["derive", "env", "string"] }
 thiserror = "2.0.17"
 anyhow = "1.0.100"
 url = { version = "2.5.7", features = ["serde"] }
-# libs
+httpmock = "0.8.2"
 
+# libs
 shared = { path = "libs/shared" }
 redis = { path = "libs/redis" }
-httpmock = "0.7"
+helpers = { path = "libs/helpers" }
